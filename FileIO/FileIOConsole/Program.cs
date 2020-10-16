@@ -27,29 +27,36 @@ namespace FileIOConsole
             Console.ReadKey();
         }
 
-        static IList<string> AllTheStations()
+        /// <summary>
+        /// Gets the data from the stations next file, returning just the station names 
+        /// </summary>
+        /// <returns>returns an IList&lt;string&gt; interface not a List. More on interfaces later in the C# course</returns>
+        static IList<string> AllTheStations() 
         {
             return 
                 File
-                    .ReadAllText("stations.txt")
-                    .Split('\n')
-                    .Select(l => l.Trim())
-                    .Where(l => l.Contains(","))
-                    .Select(l => l.Split(',')[0])
-                    .ToList();
+                    .ReadAllText("stations.txt")        // HACK: hard-coded filename 
+                    .Split('\n')                        // split on the the newline character 
+                    .Select(l => l.Trim())              // returns items with any whitespace removed from the beginning and end of each line 
+                    .Where(l => l.Contains(","))        // filters out any lines that have no commas 
+                    .Select(l => l.Split(',')[0])       // split on commas (no station name has commas) and return the first item 
+                    .ToList();                          // gather all the responses into a list 
         }
 
         static bool DoesNotShareLettersWith(string thing, string target)
         {
             return 
                 thing
-                    .All(t => !target.Contains(t));
+                    .All(t => !target.Contains(t));     // checks that *all* the characters in 'thing' are not contained in 'target' 
         }
 
         static IList<string> SharesNoLettersWith(string target, IList<string> stations)
         {
             return 
-                AllTheStations()
+                stations
+                    // filters out any for which the boolean returned is true 
+                    // uses .ToLowerInvariant to convert to lower case in a more general case than your local culture setting might give: 
+                    // https://stackoverflow.com/questions/6225808/string-tolower-and-string-tolowerinvariant 
                     .Where(s => DoesNotShareLettersWith(s.ToLowerInvariant(), target.ToLowerInvariant()))
                     .ToList();
         }
